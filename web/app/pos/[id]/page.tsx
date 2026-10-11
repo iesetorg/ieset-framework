@@ -177,8 +177,8 @@ export default async function PositionPage({
               <div className="mt-2 text-[14px] text-ink">
                 {myScore.tested > 0 ? (
                   <>
-                    Of <strong>{myScore.total_claims}</strong> listed predictions,{" "}
-                    <strong>{myScore.tested}</strong> have been tested.{" "}
+                    Of <strong>{myScore.total_claims}</strong> listed claims,{" "}
+                    <strong>{myScore.tested}</strong> have eligible advance results.{" "}
                     <span className="text-green font-semibold">{myScore.supports} supported</span>
                     {myScore.partial_supports > 0 && (
                       <> · <span style={{ color: "#5fa673" }} className="font-semibold">{myScore.partial_supports} partial +</span></>
@@ -193,14 +193,15 @@ export default async function PositionPage({
                       <> · <span className="text-amber font-semibold">{myScore.partial} inconclusive</span></>
                     )}
                     {myScore.untested > 0 && (
-                      <> · <span className="text-muted">{myScore.untested} pending</span></>
+                      <> · <span className="text-muted">{myScore.untested} unscored</span></>
                     )}
                     .
                   </>
                 ) : (
                   <>
-                    <strong>{myScore.total_claims}</strong> predictions listed, none yet tested.
-                    They update live when hypotheses run.
+                    <strong>{myScore.total_claims}</strong> claims listed, none yet
+                    qualifies for an advance forecast score. Linked historical
+                    results remain available below.
                   </>
                 )}
               </div>
@@ -317,14 +318,21 @@ export default async function PositionPage({
         )}
       </section>
 
-      {myScore && myScore.scored_claims.some((c) => c.outcome !== "untested") && (
+      {myScore && myScore.scored_claims.some((c) => c.verdict) && (
         <section className="mb-10">
           <h2 className="mb-4 border-b border-rule pb-2 text-xs font-semibold uppercase tracking-wider text-muted">
-            Specific predictions — live empirical status
+            School claims — linked empirical results
           </h2>
+          <p className="mb-4 text-[13px] leading-relaxed text-muted">
+            Advance predictions contribute to the scoreboard. Links recorded
+            after a study first ran show relevant historical evidence but do not
+            earn forecast points.
+          </p>
           <div className="space-y-3">
-            {myScore.scored_claims.filter((c) => c.outcome !== "untested").map((c, i) => {
-              const tone = outcomeTone(c.outcome);
+            {myScore.scored_claims.filter((c) => c.verdict).map((c, i) => {
+              const tone = c.outcome === "untested"
+                ? { bg: "#f3f3f1", fg: "#636363", label: "historical link" }
+                : outcomeTone(c.outcome);
               return (
                 <div
                   key={i}
@@ -361,6 +369,12 @@ export default async function PositionPage({
                         <div className="mt-2 rounded bg-panel px-3 py-2 text-[12.5px] text-muted">
                           <span className="text-ink">{c.verdict}</span>
                         </div>
+                      )}
+                      {!c.school_prediction_pre_run && (
+                        <p className="mb-0 mt-2 text-[12px] text-muted">
+                          This school link was added or changed after the study
+                          first ran, so it does not enter the forecast score.
+                        </p>
                       )}
                     </div>
                   </div>

@@ -55,6 +55,18 @@ def test_archived_and_school_held_runs_are_not_tested(tmp_path, monkeypatch):
         "scoreboard_role": "benchmark_control",
         "falsifiable_specific_claims": [claims[3]],
     }))
+    timing = {}
+    for index, claim in enumerate(claims):
+        prediction = "supported" if index == 5 else claim["school_prediction"]
+        timing[f"school_a#{index}"] = {
+            "eligible": True, "position_id": "school_a", "claim_index": index,
+            "hypothesis_id": claim["linked_hypothesis_id"], "claim": claim["claim"],
+            "scope": None, "school_prediction": prediction, "polarity": "aligned",
+        }
+    timing["control#0"] = {
+        **timing["school_a#3"], "position_id": "control", "claim_index": 0,
+    }
+    monkeypatch.setattr(coverage, "load_school_timing_index", lambda: timing)
     evidence = {
         name: {
             "public_visible": name != "legacy",

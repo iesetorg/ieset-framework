@@ -155,6 +155,7 @@ def build_claim_gate_row(
     scope: str,
     scoreboard_weight_cap: float | None = None,
     school_score_eligible: bool = True,
+    school_prediction_pre_run: bool = True,
 ) -> dict[str, Any]:
     hypothesis_id = claim.get("linked_hypothesis_id")
     prediction = coverage.get("school_prediction") or claim.get("school_prediction")
@@ -162,7 +163,7 @@ def build_claim_gate_row(
     evidence_type = hypothesis.get("evidence_type")
     outcome = "untested"
     verdict_kind = scoreboard.verdict_class(verdict)
-    if is_public and school_score_eligible:
+    if is_public and school_score_eligible and school_prediction_pre_run:
         outcome = scoreboard.position_outcome(verdict_kind, prediction, polarity)
 
     declared_gate = second_order.second_order_gate_for_hypothesis(
@@ -190,8 +191,10 @@ def build_claim_gate_row(
     recommended_score = raw_outcome_score
     if failure_credit["kind"] != "not_failure_prediction_win":
         recommended_score *= failure_credit["recommended_multiplier"]
-    if not declared_gate["scoreboard_eligible"] or not school_score_eligible:
+    if not declared_gate["scoreboard_eligible"] or not school_score_eligible or not school_prediction_pre_run:
         recommended_score = 0.0
+
+    timing_hold = is_public and school_score_eligible and not school_prediction_pre_run
 
     return {
         "position_id": position_id,
@@ -207,14 +210,16 @@ def build_claim_gate_row(
         "evidence_weight": evidence_weight,
         "scoreboard_weight_cap": scoreboard_weight_cap,
         **({"school_score_eligible": False} if is_public and not school_score_eligible else {}),
+        "school_prediction_pre_run": school_prediction_pre_run,
         "raw_school_outcome": outcome,
         "raw_weighted_score": raw_outcome_score,
-        "declared_scoreboard_eligible": bool(is_public and school_score_eligible and declared_gate["scoreboard_eligible"]),
-        "strict_scoreboard_eligible": bool(is_public and school_score_eligible and strict_gate["scoreboard_eligible"]),
-        "declared_gate_status": "school_score_hold" if is_public and not school_score_eligible else declared_gate["gate_status"],
-        "strict_gate_status": "school_score_hold" if is_public and not school_score_eligible else strict_gate["gate_status"],
+        "declared_scoreboard_eligible": bool(is_public and school_score_eligible and school_prediction_pre_run and declared_gate["scoreboard_eligible"]),
+        "strict_scoreboard_eligible": bool(is_public and school_score_eligible and school_prediction_pre_run and strict_gate["scoreboard_eligible"]),
+        "declared_gate_status": "school_score_hold" if is_public and not school_score_eligible else "school_prediction_timing_hold" if timing_hold else declared_gate["gate_status"],
+        "strict_gate_status": "school_score_hold" if is_public and not school_score_eligible else "school_prediction_timing_hold" if timing_hold else strict_gate["gate_status"],
         "promotion_gate": (
             "school_score_ineligible_post_result_links" if is_public and not school_score_eligible
+            else "school_prediction_not_pre_run" if timing_hold
             else declared_gate.get("promotion_gate") or strict_gate.get("promotion_gate")
         ),
         "required_data_gaps": sorted(
@@ -232,6 +237,7 @@ def build_claim_gate_row(
 def build_gate_index(scope: str = "all") -> dict[str, Any]:
     hypotheses, coverage_index = scoreboard.build_hypothesis_index()
     evidence_index = scoreboard.live_evidence_index()
+    timing_index = scoreboard.load_school_timing_index()
     claim_rows: list[dict[str, Any]] = []
     hypothesis_rows: dict[str, dict[str, Any]] = {}
 
@@ -252,6 +258,11 @@ def build_gate_index(scope: str = "all") -> dict[str, Any]:
             evidence_record = evidence_index.get(hypothesis_id) or {}
             cap = evidence_record.get("scoreboard_weight_cap")
             school_score_eligible = bool(evidence_record.get("school_score_eligible", True))
+            prediction = coverage.get("school_prediction") or claim.get("school_prediction")
+            polarity = coverage.get("polarity") or claim.get("claim_polarity") or "aligned"
+            prediction_pre_run = scoreboard.school_prediction_pre_run(
+                timing_index, position_id, claim_index, claim, prediction, polarity
+            )
             row = build_claim_gate_row(
                 position_id=position_id,
                 claim_index=claim_index,
@@ -263,6 +274,7 @@ def build_gate_index(scope: str = "all") -> dict[str, Any]:
                 scope=scope,
                 scoreboard_weight_cap=cap,
                 school_score_eligible=school_score_eligible,
+                school_prediction_pre_run=prediction_pre_run,
             )
             claim_rows.append(row)
 

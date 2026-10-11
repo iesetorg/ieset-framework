@@ -23,6 +23,35 @@ import audit_evidence_tiers
 
 ROOT = Path(__file__).resolve().parents[1]
 BENCHMARK_CONTROL_POSITION_IDS = {"empirical_pragmatist"}
+SCHOOL_TIMING_PATH = ROOT / "engine" / "school_prediction_timing.json"
+
+
+def load_school_timing_index(path: Path = SCHOOL_TIMING_PATH) -> dict[str, dict[str, Any]]:
+    manifest = json.loads(path.read_text())
+    if manifest.get("schema") != "ieset-school-prediction-timing-v1" or not isinstance(manifest.get("rows"), dict):
+        raise ValueError(f"invalid school prediction timing manifest: {path}")
+    return manifest["rows"]
+
+
+def school_prediction_pre_run(
+    timing_index: dict[str, dict[str, Any]],
+    position_id: str,
+    claim_index: int,
+    claim: dict[str, Any],
+    prediction: str,
+    polarity: str,
+) -> bool:
+    row = timing_index.get(f"{position_id}#{claim_index}") or {}
+    return bool(
+        row.get("eligible") is True
+        and row.get("position_id") == position_id
+        and row.get("claim_index") == claim_index
+        and row.get("hypothesis_id") == claim.get("linked_hypothesis_id")
+        and row.get("claim") == claim.get("claim")
+        and row.get("scope") == claim.get("scope")
+        and row.get("school_prediction") == prediction
+        and row.get("polarity") == polarity
+    )
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -215,6 +244,7 @@ def build_hypothesis_index() -> tuple[dict[str, dict[str, Any]], dict[tuple[str,
 def score_positions() -> dict[str, Any]:
     hypotheses, coverage_index = build_hypothesis_index()
     evidence_index = live_evidence_index()
+    timing_index = load_school_timing_index()
 
     positions: dict[str, dict[str, Any]] = {}
     raw_status_misread_risks: list[dict[str, Any]] = []
@@ -256,9 +286,12 @@ def score_positions() -> dict[str, Any]:
             coverage = coverage_index.get((position_id, claim_index)) or {}
             prediction = coverage.get("school_prediction") or claim.get("school_prediction")
             polarity = coverage.get("polarity") or claim.get("claim_polarity") or "aligned"
+            prediction_pre_run = school_prediction_pre_run(
+                timing_index, position_id, claim_index, claim, prediction, polarity
+            )
             if is_public:
                 public_claim_links += 1
-            if school_score_eligible:
+            if school_score_eligible and prediction_pre_run:
                 outcome = position_outcome(verdict_class(verdict), prediction, polarity)
                 school_scored_public_links += 1
             else:
@@ -268,7 +301,10 @@ def score_positions() -> dict[str, Any]:
                         "position_id": position_id,
                         "claim_index": claim_index,
                         "hypothesis_id": hypothesis_id,
-                        "reason": "school_score_eligible_false",
+                        "reason": (
+                            "school_score_eligible_false" if not school_score_eligible
+                            else "school_prediction_not_pre_run"
+                        ),
                     })
 
             counts[outcome] += 1
@@ -368,7 +404,7 @@ def score_positions() -> dict[str, Any]:
             "signal_rule": "Rows with |weighted net| <= max(5 points, 5% of tested predictions) are too_close_to_call, not positive or negative school findings.",
             "quality_adjustment_rule": "Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical_case_multi_metric=0.25.",
             "benchmark_control_rule": "Benchmark-control rows are computed for calibration but excluded from ranked school outcomes.",
-            "school_score_gate": "Public calibration records with school_score_eligible=false keep their links visible but count as untested for every school.",
+            "school_score_gate": "Public calibration records with school_score_eligible=false and school predictions not committed reciprocally before first run keep their links visible but count as untested.",
         },
         "public_claim_links": public_claim_links,
         "school_scored_public_links": school_scored_public_links,
@@ -409,6 +445,7 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
         "- Q-net discounts lower-identification evidence: causal=1.0, associational=0.5, descriptive/canonical=0.25.",
         "- Benchmark-control rows are computed for calibration but excluded from ranked school outcomes.",
         "- Public calibration links with `school_score_eligible=false` remain listed but are untested for all schools.",
+        "- School predictions first attached or changed after a study's first run remain visible as historical links but are excluded from advance forecast scoring.",
         "",
         "## Ranked School Outcomes",
         "",

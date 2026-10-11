@@ -22,8 +22,10 @@ import yaml
 from audit_scoreboard_outcomes import (
     hypothesis_public_verdict,
     live_evidence_index,
+    load_school_timing_index,
     load_yaml,
     position_outcome,
+    school_prediction_pre_run,
     verdict_class,
 )
 
@@ -118,6 +120,7 @@ def audit_coverage(
     # The generated JSON can be stale after even a single evidence repair.
     if evidence_index is None:
         evidence_index = live_evidence_index()
+    timing_index = load_school_timing_index()
     coverage_index: dict[tuple[str, int], dict[str, Any]] = {}
     for hypothesis in hypotheses.values():
         for coverage in hypothesis.get("covers_claims") or []:
@@ -152,6 +155,7 @@ def audit_coverage(
         scoreboard_tested_claims = 0
         scoreboard_directional_claims = 0
         public_score_holds: set[str] = set()
+        public_timing_holds: set[str] = set()
         blockers_by_hypothesis: dict[str, set[str]] = defaultdict(set)
         queue_by_hypothesis: dict[str, dict[str, Any]] = {}
 
@@ -169,20 +173,26 @@ def audit_coverage(
                 )
             is_public, verdict = verdict_cache[hypothesis_id]
             evidence = evidence_index.get(hypothesis_id) or {}
-            is_eligible = is_public and evidence.get("school_score_eligible") is not False
+            is_school_quality_eligible = is_public and evidence.get("school_score_eligible") is not False
             coverage = coverage_index.get((position_id, claim_index)) or {}
             prediction = coverage.get("school_prediction") or claim.get("school_prediction")
             polarity = coverage.get("polarity") or claim.get("claim_polarity") or "aligned"
+            prediction_pre_run = school_prediction_pre_run(
+                timing_index, position_id, claim_index, claim, prediction, polarity
+            )
+            is_eligible = is_school_quality_eligible and prediction_pre_run
             outcome = (
                 position_outcome(verdict_class(verdict), prediction, polarity)
                 if is_eligible else "untested"
             )
             if is_public:
                 public_ids.add(hypothesis_id)
-            if is_eligible:
+            if is_school_quality_eligible:
                 eligible_ids.add(hypothesis_id)
             elif is_public:
                 public_score_holds.add(hypothesis_id)
+            if is_school_quality_eligible and not prediction_pre_run:
+                public_timing_holds.add(hypothesis_id)
             if outcome != "untested":
                 tested_ids.add(hypothesis_id)
                 scoreboard_tested_claims += 1
@@ -197,8 +207,10 @@ def audit_coverage(
                 continue
             if not is_public:
                 reasons = evidence.get("exclusion_reasons") or ["not_public_unspecified"]
-            elif not is_eligible:
+            elif not is_school_quality_eligible:
                 reasons = ["school_score_eligible_false"]
+            elif not prediction_pre_run:
+                reasons = ["school_prediction_not_pre_run"]
             else:
                 reasons = ["neutral_result"]
             blockers_by_hypothesis[hypothesis_id].update(reasons)
@@ -262,6 +274,7 @@ def audit_coverage(
                 "minimum_new_directional_claims_for_target": max(0, directional_target - len(directional_linked)),
                 "unique_archived": len(archive_ids),
                 "public_school_score_holds": len(public_score_holds),
+                "public_school_timing_holds": len(public_timing_holds),
                 "archive_exclusion_reasons": dict(sorted(archive_reasons.items())),
                 "directional_blockers": dict(sorted(blocker_counts.items())),
                 "missing_hypotheses": sorted(missing_ids),
@@ -307,7 +320,7 @@ def audit_coverage(
                 "unique_tested": STRETCH_TESTED_FLOOR,
             },
             "directional_target": directional_target,
-            "unit": "Coverage counts unique existing hypothesis IDs per ranked school; separate scoreboard claim-row counts retain duplicate links. Tested requires current evidence-ledger public visibility, school-score eligibility and a scored verdict. Directional requires a non-neutral scored outcome.",
+            "unit": "Coverage counts unique existing hypothesis IDs per ranked school; separate scoreboard claim-row counts retain duplicate links. Tested requires current evidence-ledger public visibility, school-score eligibility, a reciprocal school prediction frozen before the first run, and a scored verdict. Directional requires a non-neutral scored outcome.",
             "blocker_count_rule": "Reasons can overlap within an archived hypothesis; counts are not additive. Legacy same-commit runs require genuinely prospective new tests, not relabeling.",
         },
         "summary": {
@@ -402,6 +415,7 @@ def write_outputs(audit: dict[str, Any], out_base: Path) -> None:
         "- The unit is unique existing hypothesis IDs linked from a school's falsifiable claims.",
         "- The scoreboard itself counts prediction rows. Its claim-row totals are also reported so duplicate links do not create a false audit mismatch.",
         "- A tested link must pass the current evidence-tier public gate and school-score gate and have a scored verdict. A visible run file alone does not qualify.",
+        "- A school forecast scores only when its exact claim and reciprocal prediction were committed before that hypothesis's first run. Later mappings remain visible as descriptive links.",
         "- A directional scored link has a school forecast and a non-neutral support, refutation or directional partial outcome; a `mixed` forecast and neutral partial do not qualify.",
         "- Archived runs whose spec and result first appeared in one commit cannot become preregistered by relabeling; they require a genuinely prospective test.",
         f"- {floor_label} balanced means at least `{floor['unique_hypotheses']}` unique linked hypotheses and `{floor['unique_tested']}` score-eligible tested hypotheses.",

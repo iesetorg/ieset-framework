@@ -6,7 +6,7 @@ import { VerdictLegend } from "@/components/badges/VerdictLegend";
 export const metadata = {
   title: "Scoreboard — evidence coverage by school of thought",
   description:
-    "Every position makes specific predictions linked to specific hypotheses. This page separates forecast accuracy from attribution-aware evidence about school-level mechanisms.",
+    "School forecasts score only when their reciprocal prediction was recorded before the linked study first ran. Later links remain visible as historical evidence.",
   alternates: { canonical: "https://framework.ieset.org/scoreboard/" },
 };
 
@@ -51,7 +51,7 @@ export default async function ScoreboardPage() {
             (c) =>
               c.hypothesis_exists &&
               c.linked_hypothesis_id &&
-              c.verdict
+              c.outcome !== "untested"
           )
           .map((c) => c.linked_hypothesis_id)
       );
@@ -84,7 +84,8 @@ export default async function ScoreboardPage() {
       <p className="mt-4 max-w-[780px] text-[17px] leading-[1.55] text-muted">
         Every school of thought (position) lists specific predictions it makes,
         each linked to a hypothesis in the library. When a hypothesis runs, its
-        verdict feeds back into the schools that predicted an outcome on it,
+        verdict feeds back into schools whose matching prediction was recorded
+        before that study first ran,
         while discounting broad failure calls that do not identify why a policy
         failed. This page is a diagnostic of the current authored corpus, not an
         independent ranking of economic truth.
@@ -100,7 +101,7 @@ export default async function ScoreboardPage() {
           <div className="text-[22px] font-semibold">{totalClaims}</div>
         </div>
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Predictions with a test run</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Advance predictions scored</div>
           <div className="text-[22px] font-semibold">{totalRun}</div>
         </div>
         <div>
@@ -121,12 +122,17 @@ export default async function ScoreboardPage() {
           how to read this
         </div>
         <p className="m-0">
-          <strong>Support rate</strong> = of a school&apos;s predictions that
-          have actually been tested, the fraction where the data agreed with
+          <strong>Support rate</strong> = of a school&apos;s advance predictions
+          with eligible results, the fraction where the data agreed with
           the school. A school with 1-of-1 tested prediction supported is not
           more vindicated than one with 3-of-5 — the <strong>Tested</strong>{" "}
           column matters as much as <strong>Rate</strong>. This scoreboard{" "}
           <em>is</em> the framework updating on evidence in public.
+        </p>
+        <p className="mt-3 mb-0">
+          Links added or changed after a study first ran remain available on
+          school and hypothesis pages as historical context. They do not earn
+          forecast points. The same rule applies to supportive and adverse results.
         </p>
         <p className="mt-3 mb-0">
           The strict integrity layer is deliberately conservative. It currently
@@ -278,7 +284,7 @@ export default async function ScoreboardPage() {
       {untestedOnly.length > 0 && (
         <>
           <h2 className="mt-12 mb-3 text-xs font-semibold uppercase tracking-wider text-muted">
-            Schools with no tested predictions yet
+            Schools with no eligible advance predictions yet
           </h2>
           <div className="rounded border border-rule bg-white">
             <ul className="divide-y divide-rule">
@@ -288,7 +294,7 @@ export default async function ScoreboardPage() {
                     {s.school}
                   </Link>
                   <span className="text-[13px] text-muted">
-                    {s.total_claims} prediction{s.total_claims === 1 ? "" : "s"} pending test
+                    {s.total_claims} linked claim{s.total_claims === 1 ? "" : "s"} · no advance score
                   </span>
                 </li>
               ))}

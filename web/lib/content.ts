@@ -5,6 +5,7 @@ import { execSync } from "node:child_process";
 import yaml from "js-yaml";
 import { remark } from "remark";
 import remarkHtml from "remark-html";
+import { canScoreSchoolPrediction, type SchoolPredictionTimingRow } from "./school-timing";
 
 import type {
   Condition,
@@ -24,6 +25,18 @@ const RUNS_ROOT = join(REPO_ROOT, "engine", "runs");
 // External corrections keep immutable preregistrations and run packets intact.
 // Fail the static build if this public warning registry is missing or malformed.
 const scopeNotesPath = join(REPO_ROOT, "engine", "public_evidence_scope_notes.json");
+const schoolTimingPath = join(REPO_ROOT, "engine", "school_prediction_timing.json");
+const schoolTimingIndex = (() => {
+  const manifest = JSON.parse(readFileSync(schoolTimingPath, "utf8")) as {
+    schema?: string;
+    rows?: Record<string, SchoolPredictionTimingRow>;
+  };
+  if (manifest.schema !== "ieset-school-prediction-timing-v1" ||
+      !manifest.rows || typeof manifest.rows !== "object" || Array.isArray(manifest.rows)) {
+    throw new Error("Invalid school prediction timing manifest");
+  }
+  return new Map(Object.entries(manifest.rows));
+})();
 const publicScopeNotes = (() => {
   const registry = JSON.parse(readFileSync(scopeNotesPath, "utf8")) as {
     schema?: string;
@@ -711,6 +724,7 @@ export interface ScoredClaim {
   evidence_type?: string;
   evidence_weight: number;
   school_score_eligible: boolean;
+  school_prediction_pre_run: boolean;
   coverage_confidence?: string;
   coverage_confidence_weight: number;
   hypothesis_prior_confidence?: number;
@@ -1207,7 +1221,19 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
           : "aligned";
       const school_prediction =
         coverageEntry?.school_prediction ?? c.school_prediction;
-      const outcome = verdictToOutcome(verdict, school_prediction, polarity);
+      const schoolPredictionPreRun = canScoreSchoolPrediction(
+        schoolTimingIndex.get(`${pos.position_id}#${idx}`),
+        pos.position_id,
+        idx,
+        c,
+        school_prediction,
+        polarity,
+      );
+      // Preserve the public result and its link for inspection, while only
+      // scoring school predictions frozen reciprocally before the first run.
+      const outcome = schoolPredictionPreRun
+        ? verdictToOutcome(verdict, school_prediction, polarity)
+        : "untested";
       const evidence_type = linkedHyp?.evidence_type;
       const evidence_weight = evidenceWeight(evidence_type);
       const outcome_score = outcomeScore(outcome);
@@ -1224,7 +1250,8 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
       });
       const secondOrderGate = secondOrderGateIndex?.get(`${pos.position_id}#${idx}`);
       const secondOrderStrictEligible =
-        schoolScoreEligible && (secondOrderGate?.strict_scoreboard_eligible ?? false);
+        schoolScoreEligible && schoolPredictionPreRun &&
+        (secondOrderGate?.strict_scoreboard_eligible ?? false);
       const gateFailureMultiplier =
         secondOrderGate?.failure_credit_kind &&
         secondOrderGate.failure_credit_kind !== "not_failure_prediction_win"
@@ -1252,6 +1279,7 @@ export async function scoreAllPositions(): Promise<PositionScore[]> {
         evidence_type,
         evidence_weight,
         school_score_eligible: schoolScoreEligible,
+        school_prediction_pre_run: schoolPredictionPreRun,
         coverage_confidence,
         coverage_confidence_weight,
         hypothesis_prior_confidence: linkedHyp?.prior_confidence,
