@@ -1,12 +1,12 @@
 import Link from "next/link";
 
-import { loadDrift, countryName } from "@/lib/drift";
+import { loadDrift, loadDriftStartingContext, countryName } from "@/lib/drift";
 import { loadAllPolicies, type Policy } from "@/lib/policies";
 import { DriftChart } from "@/components/charts/DriftChartLoader";
 import { InteractiveDriftChart } from "@/components/charts/InteractiveDriftChartLoader";
 
 export const metadata = {
-  title: "Positional drift — how country policy mixes shift across decades",
+  title: "Positional drift — movement direction across the coded corpus",
   description:
     "Movement-coded policy direction by country across the full authored corpus. A constructed cumulative index, with country-specific coverage starts and no measured annual policy level.",
   alternates: { canonical: "https://framework.ieset.org/drift/" },
@@ -213,6 +213,7 @@ export default async function DriftPage() {
     );
   }
   const driftData = data;
+  const contextDataset = await loadDriftStartingContext();
   const countries = Object.values(driftData.countries);
   const axisStartYears = countries.flatMap((country) =>
     Object.values(country.axis_first_year)
@@ -343,6 +344,18 @@ export default async function DriftPage() {
       iso3s: otherCountries,
     });
   }
+  const assignedCountries = new Set(REGIONS.flatMap((region) => region.countries));
+  const unassignedCountries = Object.keys(driftData.countries)
+    .filter((iso3) => !assignedCountries.has(iso3) && driftData.countries[iso3].composite_first_year !== null)
+    .sort();
+  const regionSpecs: RegionSpec[] = unassignedCountries.length > 0
+    ? [...REGIONS, {
+        id: "other_countries",
+        label: "Other countries in the corpus",
+        countries: unassignedCountries,
+        blurb: "These newly coded countries remain visible while their regional placement is reviewed.",
+      }]
+    : REGIONS;
 
   // For each region, work out which countries are in the corpus + sort by
   // movement_count desc + slice to the per-panel limit.
@@ -373,8 +386,7 @@ export default async function DriftPage() {
     return { series, starts, countries: entries.map((e) => e.iso3) };
   }
 
-  // Per-axis charts use the liberal-democracy panel only (74 lines on one
-  // axis chart would be unreadable).
+  // Per-axis charts use the most-covered liberal democracies for legibility.
   const liberalSpec = REGIONS[0];
   const liberalCountries = regionEntries(liberalSpec)
     .slice(0, PER_PANEL_LIMIT)
@@ -394,9 +406,8 @@ export default async function DriftPage() {
     return { series, starts };
   }
 
-  // The leaderboard separates the full coded sum from the slope over the
-  // latest decade. A country that enters the corpus during that decade uses
-  // only years after its first valenced axis step; a one-year series has no slope.
+  // The leaderboard separates the full coded sum from the slope over a
+  // complete recent decade of signed composite coverage.
   const RECENT_WINDOW_YEARS = 10;
   const fullLeaderboard = Object.entries(data.countries)
     .filter(([, c]) => c.composite_first_year !== null)
@@ -404,16 +415,25 @@ export default async function DriftPage() {
       const traj = c.statist_drift;
       const final = traj[traj.length - 1] ?? 0;
       const firstCodedYear = c.composite_first_year!;
-      const recentStartYear = Math.max(data.year_max - RECENT_WINDOW_YEARS, firstCodedYear);
-      const recentStartIndex = recentStartYear - data.year_min;
-      const span = data.year_max - recentStartYear;
-      const recent_slope = span > 0 ? (final - traj[recentStartIndex]) / span : null;
+      // Require a full decade of signed composite coverage for a recent slope.
+      const recent_slope = data.year_max - firstCodedYear >= RECENT_WINDOW_YEARS
+        ? (final - traj[traj.length - 1 - RECENT_WINDOW_YEARS]) / RECENT_WINDOW_YEARS
+        : null;
+      const firstYear = c.first_coded_year;
+      const contextRow = contextDataset?.countries[iso3];
+      const startingContext = contextRow?.first_coded_year === firstYear ? contextRow : null;
       return {
         iso3,
         name: countryName(iso3),
         movements: c.movement_count,
+        firstYear,
         final,
         recent_slope,
+        fiscal_context: startingContext?.fiscal ?? null,
+        fiscal_context_note: startingContext?.fiscal_note ?? (contextRow ? "Context is being refreshed after the first coded year changed." : null),
+        market_context: startingContext?.market_institutions ?? null,
+        market_context_note: startingContext?.market_institutions_note ?? (contextRow ? "Context is being refreshed after the first coded year changed." : null),
+        historical_context: startingContext?.historical_context ?? null,
       };
     })
     .sort((a, b) => b.final - a.final);
@@ -541,7 +561,21 @@ export default async function DriftPage() {
         layer here. Some national umbrella and term records also have
         overlapping policy links under source review; their country totals may
         change as duplicated steps are resolved.
+        Most axis directions are placed at a movement start as a period
+        proxy. Only {data.timing_summary.explicit_axis_year_entries} reviewed
+        entries use a documented attribution year;
+        {" "}{data.timing_summary.review_queue_entries} remain in the timing
+        review queue. Neither a step nor a mentioned policy date establishes
+        implementation or an economic effect.
       </div>
+
+      <p className="mb-8 max-w-[860px] text-[13px] leading-[1.55] text-muted">
+        Country pages retain sourced fiscal and regulatory-quality
+        observations beside the constructed line. These are dated
+        reference measures, not additions to the drift score. Opening
+        context refers to the first authored movement and is shown only
+        when its source year still matches the current country timeline.
+      </p>
 
       <p className="mb-8 max-w-[860px] text-[13px] leading-[1.55] text-muted">
         The three historical drift result cards are legacy same-commit records
@@ -593,11 +627,11 @@ export default async function DriftPage() {
         Two numbers per country. <strong className="text-ink">Cumulative</strong>{" "}
         is the sum of valenced axis steps since each country&apos;s first
         such step. <strong className="text-ink">
-        Recent (up to {RECENT_WINDOW_YEARS}y)
+        Recent ({RECENT_WINDOW_YEARS}y)
         </strong>{" "}
-        is the average annual change in that constructed score over at most
-        the last {RECENT_WINDOW_YEARS} years. A blank means fewer than two
-        covered years.
+        is the average annual change in that constructed score over the full
+        last {RECENT_WINDOW_YEARS} years. A blank means fewer than ten years of
+        signed composite coverage.
       </p>
       <div className="mb-5 max-w-[860px] rounded border border-rule bg-panel p-4 text-[13px] leading-[1.55] text-muted">
         <strong className="text-ink">Reading the columns:</strong> an older
@@ -607,6 +641,16 @@ export default async function DriftPage() {
         Scores depend on which movements have been authored and their axis
         weights, so compare coverage before comparing countries.
       </div>
+      <p className="mb-6 max-w-[900px] text-[13px] leading-[1.55] text-muted">
+        <strong className="text-ink">Market/state starting context:</strong>{" "}
+        Where a country has a researched historical anchor, its row describes
+        the institutions at that starting point. The rows also show the nearest
+        sourced fiscal footprint and World Bank Regulatory Quality estimate
+        available for the first coded year. Values within five years before or
+        at that year are marked opening; later observations are dated and
+        labelled. These are separate reference measures, not a combined
+        market/state score or part of the drift line.
+      </p>
       <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-2">
         {(() => {
           const statist = fullLeaderboard.filter((r) => r.final > 0);
@@ -642,7 +686,7 @@ export default async function DriftPage() {
                             Cumulative
                           </th>
                           <th className="px-3 py-1 text-right text-[10px] font-semibold uppercase tracking-wider text-muted">
-                            Recent (up to {RECENT_WINDOW_YEARS}y)
+                            Recent ({RECENT_WINDOW_YEARS}y)
                           </th>
                         </tr>
                       </thead>
@@ -668,7 +712,51 @@ export default async function DriftPage() {
                                   {row.iso3}
                                 </span>
                                 <div className="text-[11px] text-muted">
-                                  {row.movements} moves
+                                  {row.movements} moves since {row.firstYear}
+                                </div>
+                                <div className="mt-1 space-y-0.5 text-[10.5px] leading-[1.45] text-faint">
+                                  {row.fiscal_context ? (
+                                    <div
+                                      title={`${row.fiscal_context.label}. ${row.fiscal_context.caveat} Source: ${row.fiscal_context.publisher}.`}
+                                    >
+                                      Fiscal: {row.fiscal_context.value.toFixed(1)} {row.fiscal_context.unit} · {row.fiscal_context.observed_year}
+                                      {row.fiscal_context.relation_to_first_coded_year === "opening" ? " opening" : " later"}
+                                    </div>
+                                  ) : (
+                                    <div title={row.fiscal_context_note ?? undefined}>
+                                      Fiscal context unavailable
+                                    </div>
+                                  )}
+                                  {row.market_context ? (
+                                    <div
+                                      title={`${row.market_context.caveat} Source: ${row.market_context.publisher}.`}
+                                    >
+                                      Regulatory quality: {row.market_context.value.toFixed(2)} · {row.market_context.observed_year}
+                                      {row.market_context.relation_to_first_coded_year === "opening" ? " opening" : " later"}
+                                    </div>
+                                  ) : (
+                                    <div title={row.market_context_note ?? undefined}>
+                                      Regulatory quality unavailable
+                                    </div>
+                                  )}
+                                  {row.historical_context ? (
+                                    <div className="mt-1 max-w-[540px] text-[10.5px] leading-[1.5] text-muted">
+                                      <span className="font-medium text-ink">
+                                        {row.historical_context.as_of_year} starting institutions:
+                                      </span>
+                                      {row.historical_context.summary}{" "}
+                                      {row.historical_context.sources[0] ? (
+                                        <a
+                                          href={row.historical_context.sources[0].url}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="underline underline-offset-2"
+                                        >
+                                          Source
+                                        </a>
+                                      ) : null}
+                                    </div>
+                                  ) : null}
                                 </div>
                               </td>
                               <td
@@ -683,7 +771,7 @@ export default async function DriftPage() {
                                 className={`px-3 py-2 text-right align-top tabular-nums text-[13px] font-medium ${recentColor}`}
                               >
                                 {recent === null ? (
-                                  "—"
+                                  <span title="Fewer than ten years of signed composite coverage">n/a</span>
                                 ) : (
                                   <>
                                     {recent >= 0 ? "+" : ""}
@@ -785,7 +873,7 @@ export default async function DriftPage() {
         composite leaderboard appears above.
       </p>
       <div className="space-y-8">
-        {REGIONS.map((spec) => {
+        {regionSpecs.map((spec) => {
           const { series, starts, countries } = compositeSeriesFor(spec);
           if (countries.length === 0) return null;
           return (
@@ -822,8 +910,8 @@ export default async function DriftPage() {
       </h2>
       <p className="mb-6 max-w-[780px] text-[14px] text-muted">
         Each chart isolates one axis so the directional pattern is unambiguous.
-        Drawn only for the liberal-democracy panel because 74 lines on one
-        axis chart would be unreadable.
+        Drawn only for the twelve most-coded countries in the
+        liberal-democracy panel so the lines remain legible.
       </p>
 
       <div className="space-y-8">
@@ -872,8 +960,8 @@ export default async function DriftPage() {
           composite drift over multi-decade horizons. If the creep is not
           universal, we should see countries with sustained net-negative drift
           (Mulroney Canada, Greek post-2010 memoranda, Israeli 1985, post-1990
-          Sweden tax-reform-of-the-century, NZ Rogernomics). Both patterns
-          appear above — neither view wins by inspection alone.
+          Sweden tax reform, NZ Rogernomics). Both patterns appear above;
+          the registered hypothesis tests determine the verdict.
         </p>
         <p className="m-0 text-muted">
           That next layer lives in the hypothesis library as registered

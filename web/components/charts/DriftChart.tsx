@@ -15,7 +15,7 @@ interface MovementAnnotation {
   year: number;
   /** Display name shown next to the marker. */
   label: string;
-  /** Optional ideological tone — drives marker fill colour.
+  /** Optional coded movement direction — drives marker fill colour.
    *  "left" = state-expansion (red), "right" = market (green),
    *  "centrist" = amber, "auth" = grey, default = neutral. */
   tone?: "left" | "right" | "centrist" | "auth" | "neutral";

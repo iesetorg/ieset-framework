@@ -10,6 +10,7 @@ import {
   schoolPredictionsForHypothesis,
 } from "@/lib/content";
 import { hypothesisBibTex, hypothesisPermalink } from "@/lib/permalink";
+import { resultSourceCredits } from "@/lib/result-source-credits";
 import { absoluteUrl, githubCommitUrl } from "@/lib/site";
 import { Badge } from "@/components/badges/Badge";
 import { PreRegStrip } from "@/components/cards/PreRegStrip";
@@ -114,6 +115,7 @@ export default async function HypothesisPage({
   const varRowsWithTokens = await Promise.all(
     varRows.map(async (v) => ({ ...v, tokens: await parseSourceString(v.source) }))
   );
+  const sourceCredits = resultSourceCredits(id);
 
   const permalinkAbsolute = absoluteUrl(hypothesisPermalink(h));
   const bibtex = hypothesisBibTex(h);
@@ -510,6 +512,28 @@ export default async function HypothesisPage({
                   ))}
                 </tbody>
               </table>
+              {sourceCredits.length > 0 && (
+                <div className="mt-5 rounded border border-rule bg-white p-4 text-[12.5px] leading-[1.6] text-muted">
+                  <h3 className="m-0 mb-2 text-[11px] font-semibold uppercase tracking-wider text-ink">
+                    Publisher credits and source custody
+                  </h3>
+                  <ul className="m-0 list-disc space-y-2 pl-5">
+                    {sourceCredits.map((credit) => (
+                      <li key={credit.publisher}>
+                        {credit.citation}{" "}
+                        <a href={credit.sourceUrl} target="_blank" rel="noopener noreferrer">
+                          Dataset
+                        </a>
+                        {" · "}
+                        <a href={credit.rightsUrl} target="_blank" rel="noopener noreferrer">
+                          Terms
+                        </a>
+                        {credit.custodyNote && <span> {credit.custodyNote}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <p className="sc mt-3 text-[10px]">
                 <span className="text-green">●</span> ready &nbsp;·&nbsp;
                 <span className="text-amber">●</span> pending &nbsp;·&nbsp;
